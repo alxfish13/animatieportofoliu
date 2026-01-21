@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduard Alexandru Ion - Reveal</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050505;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* Container for the images */
+        .gallery-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0; /* Starts with no gap */
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* The individual image wrappers */
+        .img-wrapper {
+            height: 100vh;
+            width: 50vw; /* Each takes half screen initially */
+            overflow: hidden;
+            position: relative;
+            transform-origin: center;
+            will-change: width, transform;
+        }
+
+        /* The actual images */
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.4); /* Start zoomed in for parallax effect */
+        }
+
+        /* The Hero Text */
+        .hero-text {
+            position: absolute;
+            z-index: 10;
+            text-align: center;
+            mix-blend-mode: difference; /* Cool effect over images */
+            color: white;
+            opacity: 0; /* Hidden initially */
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .hero-text h1 {
+            font-size: 5vw;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .word {
+            display: inline-block;
+            transform: translateY(100%); /* Pushed down for reveal */
+        }
+
+        /* Overlay to darken image slightly for text readability later */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="gallery-container">
+        
+        <!-- PHOTO 1 (This one will disappear) -->
+        <div class="img-wrapper side-img">
+            <!-- REPLACE THE SRC BELOW WITH YOUR FIRST PHOTO URL -->
+            <img src="IMG_5994.JPG" alt="Photo 1">
+        </div>
+
+        <!-- PHOTO 2 (This one remains center) -->
+        <div class="img-wrapper center-img">
+            <div class="overlay"></div>
+            <!-- REPLACE THE SRC BELOW WITH YOUR SECOND PHOTO URL -->
+            <img src="IMG_5995.JPG" alt="Eduard">
+        </div>
+
+    </div>
+
+    <div class="hero-text">
+        <h1>
+            <span class="word-wrap"><span class="word">Eduard</span></span>
+            <span class="word-wrap"><span class="word">Alexandru</span></span>
+            <span class="word-wrap"><span class="word">Ion</span></span>
+        </h1>
+    </div>
+
+    <script>
+        // Wait for page to load
+        window.addEventListener("load", () => {
+            
+            // Register GSAP plugins
+            gsap.registerPlugin(CustomEase);
+
+            // Create a custom easing for that "modern web" snappy feel
+            CustomEase.create("hop", "M0,0 C0.084,0.61 0.214,0.802 0.45,0.856 0.626,0.896 0.766,1 1,1");
+
+            const tl = gsap.timeline({ delay: 0.5 });
+
+            // 1. Zoom Out Phase (Scale down the wrappers slightly)
+            tl.to(".img-wrapper", {
+                width: "40vw", // Shrink width slightly
+                height: "60vh", // Shrink height significantly to create the "card" look
+                duration: 1.5,
+                ease: "hop"
+            })
+            // Animate the internal images to scale down nicely (parallax)
+            .to(".img-wrapper img", {
+                scale: 1, 
+                duration: 1.5,
+                ease: "power2.out"
+            }, "<")
+            
+            // Add spacing between them momentarily
+            .to(".gallery-container", {
+                gap: "20px",
+                duration: 1,
+                ease: "power2.out"
+            }, "<")
+
+            // 2. Collapse Phase (Remove the left image)
+            .to(".side-img", {
+                width: "0vw",
+                opacity: 0,
+                duration: 1,
+                ease: "power4.inOut"
+            }, "+=0.2") // Slight pause before collapsing
+
+            // 3. Hero Expansion (Remaining image takes center stage)
+            .to(".center-img", {
+                width: "400px", // Final width of portrait
+                height: "550px", // Final height of portrait
+                duration: 1.2,
+                ease: "hop"
+            }, "<") // Happens at same time as collapse
+            
+            // 4. Text Reveal
+            .to(".hero-text", {
+                opacity: 1,
+                duration: 0.1
+            }, "-=0.5")
+            
+            .to(".word", {
+                y: 0,
+                stagger: 0.1,
+                duration: 1,
+                ease: "power4.out"
+            }, "<")
+
+            // Optional: Darken image slightly so white text pops
+            .to(".overlay", {
+                opacity: 0.3,
+                duration: 1
+            }, "<");
+        });
+    </script>
+</body>
+</html>
